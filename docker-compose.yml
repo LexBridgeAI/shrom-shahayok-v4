@@ -1,0 +1,28 @@
+version: '3.9'
+services:
+  backend:
+    build: ./backend
+    container_name: shrom-v4-api
+    restart: unless-stopped
+    environment:
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - SECRET_KEY=${SECRET_KEY:-shrom-v4-local-secret}
+      - DATABASE_URL=sqlite+aiosqlite:///./data/shrom.db
+    volumes:
+      - ./data:/app/data
+    ports:
+      - "8000:8000"
+
+  frontend:
+    image: nginx:alpine
+    container_name: shrom-v4-frontend
+    volumes:
+      - ./index.html:/usr/share/nginx/html/index.html
+      - ./portal-management:/usr/share/nginx/html/portal-management
+      - ./portal-worker:/usr/share/nginx/html/portal-worker
+      - ./portal-legal:/usr/share/nginx/html/portal-legal
+      - ./portal-academic:/usr/share/nginx/html/portal-academic
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
